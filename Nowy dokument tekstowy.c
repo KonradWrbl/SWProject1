@@ -17,57 +17,19 @@
 
 // --- Zmienne u¿ytkownika ---
 int licz = 0;                	// Licznik przerwañ
-char czOtw, czZam;
 int tim1 = 0; tim2 = 0; diod = 0;
-char kier = 0, silnik;
+char kier = 0;
 char stan = 1;
 
 void prolog(void)			// Inicjowanie programu (jednorazowo przy starcie)
 {
-    L1 = L2 = L3 = L4 = 0;         	// Zgaszenie LED-ów
+    L1 = L2 = L3 = L4 = L5 = 0;         	// Zgaszenie LED-ów
 }
 
 void oblicz(void)			// Kod u¿ytkownika wykonywany cyklicznie
 {
-    /*L1=aK1; L2=aK2; L3=aK3; L4=aK4;
-
-    if(aK1) Z1 = 1; else Z1 = 0;
-    if(aK2) Z2 = 1; else Z2 = 0;
-    if(aK3) Z3 = 1; else Z3 = 0;
-    if(aK4) G1 = 1; else G1 = 0;
-    if(aK4) M  = 1; else M  = 0;
-
-    if(licz >= 12000) licz=0;
-
-    AO[0] += 100; AO[1] += 200;
-    AO[2] += 300; AO[3] += 400;
-    AO[4] += 500; AO[5] += 600;
-    AO[6] += 700; AO[7] = licz/100;
-    */
-    czOtw = aK3;
-    czZam = aK4;
-
     switch (stan)
     {
-        /*
-            case 1: // Oczekiwanie
-                L1=0; L2=0; L3=0; L4=0;
-                if(aK1&&!pK1) { tim1=100; tim2=(100-tim1)/10+1; kier=1; silnik=1; stan=2; }	// Otwórz
-                if(aK2&&!pK2) { tim1=100; tim2=tim1/10+1; kier=0; silnik=1; stan=3; }	// Zamknij
-                break;
-            case 2: // Otwieranie
-                L1=1; L2=0; L4=0;
-                if(czOtw) { silnik=0; stan=1; }	// Stop
-                if(aK2&&!pK2) { tim1=100; tim2=(100-tim1)/10+1; kier=0; silnik=1; stan=3; }	// Zamknij
-                if(!tim2) { L3=!L3; tim2=tim1/10+1; }
-                break;
-            case 3: // Zamykanie
-                L1=0; L2=1; L3=0;
-                if(czZam) { silnik=0; stan=1; }	// Stop
-                if(aK1&&!pK1) { tim1=100; tim2=tim1/10+1; kier=1; silnik=1; stan=2; }	// Zamknij
-                if(!tim2) { L4=!L4; tim2=(100-tim1)/10+1; }
-                break;
-        */
     case 1: // oczekiwanie na uruchomienie urz¹dzenia przyciskiem aK1
         L1 = 0; L2 = 0; L3 = 0; L4 = 0; L5 = 0;
         if (aK1) { tim1 = 50; tim2 = 5; stan = 2; L5 = 1; };
@@ -87,7 +49,6 @@ void oblicz(void)			// Kod u¿ytkownika wykonywany cyklicznie
         L1 = 0; L2 = 1; L3 = 1; L4 = 0; L5 = 0;
         if (aK1) { tim1 = 50; stan = 5; tim2 = 5; L5 = 1; }
         else if (aK2) { tim1 = 20; stan = 7; };
-        // @TODO stan dalszy
         break;
     case 5: //wy³¹czanie urz¹dzenia
         L1 = 0; L2 = 1; L3 = 0; L4 = 0;
@@ -100,7 +61,7 @@ void oblicz(void)			// Kod u¿ytkownika wykonywany cyklicznie
         if (!aK1) { stan = 1; }
         else if (!tim2) { L5 = 0; };
         break;
-    case 7: // aktywowaniie podnoszenia rolety
+    case 7: // aktywowanie podnoszenia rolety
         L1 = 0; L2 = 1; L3 = 1;
         if (!tim1) { stan = 17; kier = 1; }
         else if (tim1 && !aK2) { stan = 4; };
@@ -114,11 +75,11 @@ void oblicz(void)			// Kod u¿ytkownika wykonywany cyklicznie
         };
         break;
     case 9: // podnoszenie rolety do aK4
-        L1 = 1; L2 = 1; L3 = 1; L4 = 1;
+        L1 = 1; L2 = 1; L3 = 1;
         if (aK4) { stan = 10; tim2 = 5; L4 = 0; }
         else if (aK2) { stan = 13; tim2 = 5; }
         else if (!tim2) {
-            tim2 = 4;
+            tim2 = 2;
             L4 = !L4;
         };
         break;
@@ -141,7 +102,7 @@ void oblicz(void)			// Kod u¿ytkownika wykonywany cyklicznie
         L1 = 1; L2 = 1; L3 = 1;
         if (!aK4) { stan = 12; }
         else if (!tim2) {
-            tim2 = 3;
+            tim2 = 4;
             L4 = !L4;
         };
         break;
@@ -179,12 +140,9 @@ void oblicz(void)			// Kod u¿ytkownika wykonywany cyklicznie
         L1 = 1; L2 = 1; L3 = 1;
         if (!aK2 && kier == 1) { stan = 8; }
         else if (!aK2 && kier == 0) { stan = 11; }
-        //else if(!tim2) {L4=!L4; tim2=5;};
         break;
 
     }
-    //AO[0] = tim2*5;
-    //L5=!L5;
     printf(&stan, "%c");
     sprintf(buf, "K1=%dK2=%dK3=%dK4=%d    ", (int)aK1, (int)aK2, (int)aK3, (int)aK4);
     LCD_xy(1, 1); LCD_puts(buf);
