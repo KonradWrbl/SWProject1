@@ -181,7 +181,7 @@ void wykres(void)			// Dane do tabeli i wykresu (dot. symulacji obiektu)
     bTab[5] = (int)L2;
     bTab[6] = (int)L3;
     bTab[7] = (int)L4;
-    bTab[8] = Z3;
+    bTab[8] = (int)L5;
     bTab[9] = G1;
     bTab[10] = M;
     bTab[11] = 11;
